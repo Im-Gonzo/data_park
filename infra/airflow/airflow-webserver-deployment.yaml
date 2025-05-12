@@ -17,9 +17,15 @@ spec:
       - name: wait-for-postgres
         image: alpine:3.16
         command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;']
-      - name: airflow-init
+      - name: wait-for-redis
+        image: alpine:3.16
+        command: ['sh', '-c', 'until nc -z redis 6379; do echo waiting for redis; sleep 2; done;']
+      - name: wait-for-airflow-init
         image: apache/airflow:2.7.1
-        command: ['sh', '-c', 'airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com']
+        command: ['sh', '-c', 'until airflow db check; do echo "Waiting for Airflow DB initialization"; sleep 5; done']
+        env:
+        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+          value: "postgresql+psycopg2://airflow:airflow@postgres:5432/airflow"
         volumeMounts:
         - name: airflow-config
           mountPath: /opt/airflow/airflow.cfg

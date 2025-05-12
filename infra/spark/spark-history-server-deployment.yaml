@@ -25,7 +25,11 @@ spec:
           name: history-ui
         env:
         - name: SPARK_HISTORY_OPTS
-          value: "-Dspark.history.ui.port=18080 -Dspark.history.fs.logDirectory=/spark-logs -Dspark.history.retainedApplications=50"
+          value: "-Dspark.history.ui.port=18080 -Dspark.history.fs.logDirectory=/spark-logs -Dspark.history.retainedApplications=50 -Dspark.hadoop.fs.defaultFS=file:/// -Dspark.hadoop.fs.permissions.umask-mode=000"
+        - name: SPARK_AUTH_SOCKET_TIMEOUT
+          value: "3600000"
+        - name: HADOOP_USER_NAME
+          value: "spark"
         volumeMounts:
         - name: spark-logs
           mountPath: /spark-logs

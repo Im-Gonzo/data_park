@@ -64,6 +64,17 @@ data:
   02-airflow-metadata.sql: |
     \c airflow;
     
-    -- Create role for Airflow connection
-    CREATE USER airflow WITH PASSWORD 'airflow';
-    GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
+    -- Make airflow user the owner of the database
+    ALTER DATABASE airflow OWNER TO airflow;
+    
+    -- Grant schema-level permissions
+    GRANT ALL PRIVILEGES ON SCHEMA public TO airflow;
+    GRANT CREATE ON SCHEMA public TO airflow;
+    
+    -- Grant table-level permissions (for future tables)
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO airflow;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO airflow;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO airflow;
+    
+    -- Grant usage on public schema
+    GRANT USAGE ON SCHEMA public TO airflow;

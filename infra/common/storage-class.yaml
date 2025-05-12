@@ -3,6 +3,6 @@ kind: StorageClass
 metadata:
   name: local-storage
   namespace: data-park
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
+provisioner: microk8s.io/hostpath
+volumeBindingMode: Immediate
 reclaimPolicy: Retain
