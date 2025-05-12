@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-init-topics
+  namespace: data-park
+spec:
+  template:
+    spec:
+      containers:
+      - name: kafka-init
+        image: confluentinc/cp-kafka:7.4.0
+        command:
+        - /bin/bash
+        - /scripts/create-topics.sh
+        volumeMounts:
+        - name: init-scripts
+          mountPath: /scripts
+      volumes:
+      - name: init-scripts
+        configMap:
+          name: kafka-init-topics
+          defaultMode: 0755
+      restartPolicy: Never
+  backoffLimit: 3

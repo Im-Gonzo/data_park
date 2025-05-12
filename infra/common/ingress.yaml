@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: data-park-ingress
+  namespace: data-park
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - host: data-park.local
+    http:
+      paths:
+      - path: /spark(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-master
+            port:
+              number: 8080
+      - path: /history(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-history-server
+            port:
+              number: 18080
+      - path: /airflow(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: airflow-webserver
+            port:
+              number: 8080
+      - path: /jupyter(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: jupyter-notebook
+            port:
+              number: 8888

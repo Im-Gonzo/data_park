@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  namespace: data-park
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-scheduler
+  template:
+    metadata:
+      labels:
+        app: airflow-scheduler
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: alpine:3.16
+        command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;']
+      containers:
+      - name: airflow-scheduler
+        image: apache/airflow:2.7.1
+        command: ['airflow', 'scheduler']
+        env:
+        - name: AIRFLOW__CORE__EXECUTOR
+          value: "CeleryExecutor"
+        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+          value: "postgresql+psycopg2://airflow:airflow@postgres:5432/airflow"
+        - name: AIRFLOW__CELERY__BROKER_URL
+          value: "redis://redis:6379/0"
+        - name: AIRFLOW__CELERY__RESULT_BACKEND
+          value: "db+postgresql://airflow:airflow@postgres:5432/airflow"
+        - name: AIRFLOW__CORE__FERNET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: airflow-secrets
+              key: airflow-fernetkey
+        - name: AIRFLOW__CORE__LOAD_EXAMPLES
+          value: "false"
+        volumeMounts:
+        - name: airflow-config
+          mountPath: /opt/airflow/airflow.cfg
+          subPath: airflow.cfg
+        - name: dags-volume
+          mountPath: /opt/airflow/dags
+        - name: plugins-volume
+          mountPath: /opt/airflow/plugins
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+      volumes:
+      - name: airflow-config
+        configMap:
+          name: airflow-config
+          items:
+          - key: airflow.cfg
+            path: airflow.cfg
+      - name: dags-volume
+        emptyDir: {}
+      - name: plugins-volume
+        emptyDir: {}

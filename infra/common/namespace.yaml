@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: data-park
+  labels:
+    name: data-park
+    app: data-park
+    environment: local

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-notebook
+  namespace: data-park
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter-notebook
+  template:
+    metadata:
+      labels:
+        app: jupyter-notebook
+    spec:
+      containers:
+      - name: jupyter-notebook
+        image: jupyter/pyspark-notebook:python-3.11
+        ports:
+        - containerPort: 8888
+          name: jupyter
+        env:
+        - name: JUPYTER_ENABLE_LAB
+          value: "yes"
+        - name: SPARK_MASTER
+          value: "spark://spark-master:7077"
+        - name: SPARK_OPTS
+          value: "--conf spark.driver.memory=1g --conf spark.executor.memory=1g"
+        - name: GRANT_SUDO
+          value: "yes"
+        command: ["start-notebook.sh"]
+        args: ["--NotebookApp.token=''", "--NotebookApp.password=''"]
+        volumeMounts:
+        - name: notebook-volume
+          mountPath: /home/jovyan/work
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+      volumes:
+      - name: notebook-volume
+        persistentVolumeClaim:
+          claimName: jupyter-pvc

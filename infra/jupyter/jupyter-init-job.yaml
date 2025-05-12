@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jupyter-init
+  namespace: data-park
+spec:
+  template:
+    spec:
+      containers:
+      - name: jupyter-init
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          cp /samples/* /notebooks/
+          chmod 666 /notebooks/*
+        volumeMounts:
+        - name: sample-notebooks
+          mountPath: /samples
+        - name: notebook-volume
+          mountPath: /notebooks
+      restartPolicy: Never
+      volumes:
+      - name: sample-notebooks
+        configMap:
+          name: jupyter-samples
+      - name: notebook-volume
+        persistentVolumeClaim:
+          claimName: jupyter-pvc
+  backoffLimit: 3
