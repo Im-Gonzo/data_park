@@ -59,12 +59,6 @@ check_dependencies() {
     else
         success_message "kubectl found"
     fi
-    
-    if ! command_exists minikube; then
-        warning_message "minikube not found. If you're not using minikube, ignore this warning."
-    else
-        success_message "minikube found"
-    fi
 }
 
 # Function to check if Kubernetes is running
