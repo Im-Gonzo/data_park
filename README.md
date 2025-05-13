@@ -12,22 +12,27 @@ This repository provides infrastructure and code examples for advanced data engi
 - Data pipeline orchestration with Airflow
 - Data generation for realistic scenarios
 
+## Accessing Services
+
+Services are directly accessible via NodePort:
+- **Spark Master UI**: http://localhost:30080
+- **Spark History Server**: http://localhost:30081
+- **Airflow UI**: http://localhost:30082
+  - Username: `admin`
+  - Password: `admin`
+- **Jupyter Notebook**: http://localhost:30083
+
 ## Repository Structure
 
 ```
 data_park/
-├── k8s/                              # Kubernetes manifests
-│   ├── spark/                        # Spark operator and deployments
+├── infra/                            # Kubernetes manifests
+│   ├── spark/                        # Spark deployments
 │   ├── kafka/                        # Kafka and Zookeeper
 │   ├── postgres/                     # PostgreSQL database
 │   ├── airflow/                      # Airflow deployment
-│   └── jupyter/                      # Jupyter notebook server
-│
-├── configs/                          # Configuration files
-│   ├── spark/                        # Spark configurations
-│   ├── kafka/                        # Kafka configurations
-│   ├── airflow/                      # Airflow DAGs and configs
-│   └── postgres/                     # PostgreSQL init scripts and configs
+│   ├── jupyter/                      # Jupyter notebook server
+│   └── common/                       # Common resources (namespace, storage)
 │
 ├── python/                           # Python code examples
 │   ├── batch/                        # Batch processing examples
@@ -36,8 +41,6 @@ data_park/
 │   ├── elt/                          # ELT examples
 │   ├── airflow/                      # Airflow DAGs
 │   └── generators/                   # Data generators
-│       ├── kafka/                    # Kafka data generators
-│       └── postgres/                 # PostgreSQL data generators
 │
 ├── scala/                            # Scala code examples
 │   ├── batch/                        # Batch processing examples
@@ -56,15 +59,21 @@ data_park/
 │
 └── scripts/                          # Utility scripts
     ├── setup.sh                      # Environment setup
-    ├── deploy.sh                     # Deployment to K8s
+    ├── status.sh                     # Check service status
     └── cleanup.sh                    # Environment cleanup
 ```
 
 ## Getting Started
 
-1. See the [setup guide](docs/setup/README.md) for instructions on deploying the infrastructure.
-2. Check the [architecture documentation](docs/architecture/README.md) for an overview of the system components.
-3. Follow the [tutorials](docs/tutorials/README.md) to learn about the various data engineering patterns.
+1. Run the setup script to deploy the infrastructure:
+   ```bash
+   cd scripts
+   ./setup.sh
+   ```
+
+2. Access the services at the URLs listed above.
+
+3. Check the [documentation](docs/) for more details on how to use the platform.
 
 ## Core Technologies
 

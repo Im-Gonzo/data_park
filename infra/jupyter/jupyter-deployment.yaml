@@ -20,6 +20,8 @@ spec:
         - containerPort: 8888
           name: jupyter
         env:
+        - name: JUPYTER_BASE_URL
+          value: "/jupyter"
         - name: JUPYTER_ENABLE_LAB
           value: "yes"
         - name: SPARK_MASTER

@@ -166,13 +166,10 @@ deploy_component "jupyter" "📓" || exit 1
 wait_for_pods "jupyter-notebook" 180
 
 echo -e "\n${BOLD}${GREEN}🎉 Data Park Environment Setup Complete! 🎉${RESET}"
-echo -e "\n${BOLD}${CYAN}📊 Access the services at:${RESET}"
-echo -e "${YELLOW}📌 Spark UI:${RESET} http://data-park.local/spark"
-echo -e "${YELLOW}📌 Spark History:${RESET} http://data-park.local/history"
-echo -e "${YELLOW}📌 Airflow:${RESET} http://data-park.local/airflow"
-echo -e "${YELLOW}📌 Jupyter:${RESET} http://data-park.local/jupyter"
-
-echo -e "\n${CYAN}To add data-park.local to your hosts file:${RESET}"
-echo -e "${YELLOW}sudo echo \"127.0.0.1 data-park.local\" >> /etc/hosts${RESET}"
+echo -e "\n${BOLD}${CYAN}📊 Access the services directly at:${RESET}"
+echo -e "${YELLOW}📌 Spark UI:${RESET} http://localhost:30080"
+echo -e "${YELLOW}📌 Spark History:${RESET} http://localhost:30081"
+echo -e "${YELLOW}📌 Airflow:${RESET} http://localhost:30082"
+echo -e "${YELLOW}📌 Jupyter:${RESET} http://localhost:30083"
 
 echo -e "\n${BOLD}${GREEN}Happy data engineering! 🚀${RESET}\n"

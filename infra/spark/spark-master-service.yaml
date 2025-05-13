@@ -6,12 +6,14 @@ metadata:
   labels:
     app: spark-master
 spec:
+  type: NodePort
   ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30080
+    name: ui
   - port: 7077
     targetPort: 7077
     name: master
-  - port: 8080
-    targetPort: 8080
-    name: ui
   selector:
     app: spark-master

@@ -6,9 +6,11 @@ metadata:
   labels:
     app: spark-history-server
 spec:
+  type: NodePort
   ports:
   - port: 18080
     targetPort: 18080
-    name: history-ui
+    nodePort: 30081
+    name: ui
   selector:
     app: spark-history-server
