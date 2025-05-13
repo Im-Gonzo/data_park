@@ -13,13 +13,6 @@ spec:
       labels:
         app: spark-worker
     spec:
-      initContainers:
-      - name: install-jdbc-driver
-        image: curlimages/curl:7.88.1
-        command: ['sh', '-c', 'curl -L https://jdbc.postgresql.org/download/postgresql-42.5.0.jar -O /drivers/postgresql-42.5.0.jar']
-        volumeMounts:
-        - name: jdbc-drivers
-          mountPath: /drivers
       containers:
       - name: spark-worker
         image: bitnami/spark:3.4.1
@@ -46,15 +39,6 @@ spec:
           value: "no"
         - name: SPARK_SSL_ENABLED
           value: "no"
-        - name: SPARK_EXECUTOR_EXTRACLASSPATH
-          value: "/opt/bitnami/spark/drivers/*"
-        - name: SPARK_PUBLIC_DNS
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
-        volumeMounts:
-        - name: jdbc-drivers
-          mountPath: /opt/bitnami/spark/drivers
         resources:
           requests:
             memory: "1.5Gi"
@@ -62,6 +46,3 @@ spec:
           limits:
             memory: "2Gi"
             cpu: "1000m"
-      volumes:
-      - name: jdbc-drivers
-        emptyDir: {}
