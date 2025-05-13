@@ -152,7 +152,6 @@ wait_for_pods "kafka" 180
 deploy_component "spark" "⚡" || exit 1
 wait_for_pods "spark-master" 120
 wait_for_pods "spark-worker" 120
-wait_for_pods "spark-history-server" 120
 
 # Deploy Airflow
 deploy_component "airflow" "🔄" || exit 1
@@ -168,7 +167,6 @@ wait_for_pods "jupyter-notebook" 180
 echo -e "\n${BOLD}${GREEN}🎉 Data Park Environment Setup Complete! 🎉${RESET}"
 echo -e "\n${BOLD}${CYAN}📊 Access the services directly at:${RESET}"
 echo -e "${YELLOW}📌 Spark UI:${RESET} http://localhost:30080"
-echo -e "${YELLOW}📌 Spark History:${RESET} http://localhost:30081"
 echo -e "${YELLOW}📌 Airflow:${RESET} http://localhost:30082"
 echo -e "${YELLOW}📌 Jupyter:${RESET} http://localhost:30083"
 
