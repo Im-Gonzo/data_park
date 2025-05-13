@@ -175,9 +175,4 @@ echo -e "${YELLOW}📌 Jupyter:${RESET} http://data-park.local/jupyter"
 echo -e "\n${CYAN}To add data-park.local to your hosts file:${RESET}"
 echo -e "${YELLOW}sudo echo \"127.0.0.1 data-park.local\" >> /etc/hosts${RESET}"
 
-echo -e "\n${BOLD}${CYAN}💡 Remember to forward ports if using minikube:${RESET}"
-echo -e "${YELLOW}kubectl port-forward -n data-park svc/spark-master 8080:8080 &${RESET}"
-echo -e "${YELLOW}kubectl port-forward -n data-park svc/airflow-webserver 8081:8080 &${RESET}"
-echo -e "${YELLOW}kubectl port-forward -n data-park svc/jupyter-notebook 8888:8888 &${RESET}"
-
 echo -e "\n${BOLD}${GREEN}Happy data engineering! 🚀${RESET}\n"
