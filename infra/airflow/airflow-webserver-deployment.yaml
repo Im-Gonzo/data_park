@@ -38,7 +38,7 @@ spec:
         command: ['sh', '-c', 'airflow connections import /opt/airflow/connections.yaml && airflow webserver']
         env:
         - name: AIRFLOW__WEBSERVER__BASE_URL
-          value: "http://data-park.local/airflow"
+          value: ""
         - name: AIRFLOW__CORE__EXECUTOR
           value: "CeleryExecutor"
         - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
