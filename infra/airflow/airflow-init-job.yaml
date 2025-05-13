@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-init
+  namespace: data-park
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: alpine:3.16
+        command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;']
+      containers:
+      - name: airflow-init
+        image: apache/airflow:2.7.1
+        command:
+        - /bin/bash
+        - -c
+        - |
+          airflow db migrate && 
+          airflow connections create-default-connections &&
+          airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com
+        env:
+        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+          value: "postgresql+psycopg2://airflow:airflow@postgres:5432/airflow"
+        - name: AIRFLOW__CORE__LOAD_EXAMPLES
+          value: "false"
+        - name: AIRFLOW__WEBSERVER__EXPOSE_CONFIG
+          value: "true"  
+      restartPolicy: OnFailure

@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-fix-permissions
+  namespace: data-park
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: postgres-client
+        image: postgres:15.3
+        command:
+        - /bin/bash
+        - -c
+        - |
+          PGPASSWORD=postgrespass psql -h postgres -U postgres -d airflow -c "
+          ALTER DATABASE airflow OWNER TO airflow;
+          GRANT ALL PRIVILEGES ON SCHEMA public TO airflow;
+          GRANT CREATE ON SCHEMA public TO airflow;
+          ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO airflow;
+          ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO airflow;
+          ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO airflow;
+          GRANT USAGE ON SCHEMA public TO airflow;
+          "
+          echo "Permissions updated successfully."
+      restartPolicy: OnFailure
