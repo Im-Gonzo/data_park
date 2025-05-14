@@ -1,291 +1,96 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: jupyter-samples
+  name: jupyter-configmap
   namespace: data-park
 data:
-  sample-spark-batch.ipynb: |
-    {
-     "cells": [
-      {
-       "cell_type": "markdown",
-       "metadata": {},
-       "source": [
-        "# Sample Spark Batch Processing Notebook\n",
-        "\n",
-        "This notebook demonstrates how to use Apache Spark for batch processing."
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "from pyspark.sql import SparkSession\n",
-        "\n",
-        "# Create a Spark session\n",
-        "spark = SparkSession.builder \\\n",
-        "    .appName(\"Sample Batch Processing\") \\\n",
-        "    .master(\"spark://spark-master:7077\") \\\n",
-        "    .config(\"spark.driver.memory\", \"1g\") \\\n",
-        "    .config(\"spark.executor.memory\", \"1g\") \\\n",
-        "    .getOrCreate()\n",
-        "\n",
-        "print(\"Spark session created\")\n",
-        "print(f\"Spark version: {spark.version}\")"
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "# Sample data\n",
-        "data = [(\"John\", 30), (\"Alice\", 25), (\"Bob\", 35)]\n",
-        "df = spark.createDataFrame(data, [\"name\", \"age\"])\n",
-        "df.show()"
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "# Perform some transformations\n",
-        "df_filtered = df.filter(df.age > 25)\n",
-        "df_filtered.show()"
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "# Stop the Spark session\n",
-        "spark.stop()"
-       ]
-      }
-     ],
-     "metadata": {
-      "kernelspec": {
-       "display_name": "Python 3",
-       "language": "python",
-       "name": "python3"
-      },
-      "language_info": {
-       "codemirror_mode": {
-        "name": "ipython",
-        "version": 3
-       },
-       "file_extension": ".py",
-       "mimetype": "text/x-python",
-       "name": "python",
-       "nbconvert_exporter": "python",
-       "pygments_lexer": "ipython3",
-       "version": "3.8.10"
-      }
-     },
-     "nbformat": 4,
-     "nbformat_minor": 4
-    }
-  
-  sample-kafka-streaming.ipynb: |
-    {
-     "cells": [
-      {
-       "cell_type": "markdown",
-       "metadata": {},
-       "source": [
-        "# Sample Kafka Streaming Notebook\n",
-        "\n",
-        "This notebook demonstrates how to use Spark Structured Streaming with Kafka."
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "from pyspark.sql import SparkSession\n",
-        "from pyspark.sql.functions import col, from_json\n",
-        "from pyspark.sql.types import StructType, StructField, StringType, IntegerType, TimestampType\n",
-        "\n",
-        "# Create a Spark session\n",
-        "spark = SparkSession.builder \\\n",
-        "    .appName(\"Kafka Streaming\") \\\n",
-        "    .master(\"spark://spark-master:7077\") \\\n",
-        "    .config(\"spark.jars.packages\", \"org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1\") \\\n",
-        "    .config(\"spark.driver.memory\", \"1g\") \\\n",
-        "    .config(\"spark.executor.memory\", \"1g\") \\\n",
-        "    .getOrCreate()\n",
-        "\n",
-        "print(\"Spark session created\")"
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "# Define schema for the incoming data\n",
-        "schema = StructType([\n",
-        "    StructField(\"id\", StringType(), True),\n",
-        "    StructField(\"value\", IntegerType(), True),\n",
-        "    StructField(\"timestamp\", TimestampType(), True)\n",
-        "])\n",
-        "\n",
-        "# Read from Kafka\n",
-        "df = spark \\\n",
-        "    .readStream \\\n",
-        "    .format(\"kafka\") \\\n",
-        "    .option(\"kafka.bootstrap.servers\", \"kafka:9092\") \\\n",
-        "    .option(\"subscribe\", \"customer-events\") \\\n",
-        "    .option(\"startingOffsets\", \"earliest\") \\\n",
-        "    .load()\n",
-        "\n",
-        "# Parse the value column as JSON\n",
-        "parsed_df = df.select(\n",
-        "    from_json(col(\"value\").cast(\"string\"), schema).alias(\"data\")\n",
-        ").select(\"data.*\")\n",
-        "\n",
-        "# Display the streaming data\n",
-        "query = parsed_df \\\n",
-        "    .writeStream \\\n",
-        "    .format(\"console\") \\\n",
-        "    .outputMode(\"append\") \\\n",
-        "    .start()\n",
-        "\n",
-        "# Wait for the query to terminate\n",
-        "# Note: In a notebook, you'll need to stop this cell manually\n",
-        "# query.awaitTermination()"
-       ]
-      }
-     ],
-     "metadata": {
-      "kernelspec": {
-       "display_name": "Python 3",
-       "language": "python",
-       "name": "python3"
-      },
-      "language_info": {
-       "codemirror_mode": {
-        "name": "ipython",
-        "version": 3
-       },
-       "file_extension": ".py",
-       "mimetype": "text/x-python",
-       "name": "python",
-       "nbconvert_exporter": "python",
-       "pygments_lexer": "ipython3",
-       "version": "3.8.10"
-      }
-     },
-     "nbformat": 4,
-     "nbformat_minor": 4
-    }
-  
-  postgres-connection.ipynb: |
-    {
-     "cells": [
-      {
-       "cell_type": "markdown",
-       "metadata": {},
-       "source": [
-        "# PostgreSQL Connection with Spark\n",
-        "\n",
-        "This notebook demonstrates how to connect Spark to PostgreSQL."
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "from pyspark.sql import SparkSession\n",
-        "\n",
-        "# Create a Spark session\n",
-        "spark = SparkSession.builder \\\n",
-        "    .appName(\"PostgreSQL Connection\") \\\n",
-        "    .master(\"spark://spark-master:7077\") \\\n",
-        "    .config(\"spark.driver.memory\", \"1g\") \\\n",
-        "    .config(\"spark.executor.memory\", \"1g\") \\\n",
-        "    .config(\"spark.jars\", \"/opt/spark-jars/postgresql-42.6.0.jar\") \\\n",
-        "    .getOrCreate()\n",
-        "\n",
-        "print(\"Spark session created\")"
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "# Read data from PostgreSQL\n",
-        "df = spark.read \\\n",
-        "    .format(\"jdbc\") \\\n",
-        "    .option(\"url\", \"jdbc:postgresql://postgres:5432/datamart\") \\\n",
-        "    .option(\"dbtable\", \"raw.customers\") \\\n",
-        "    .option(\"user\", \"spark\") \\\n",
-        "    .option(\"password\", \"spark\") \\\n",
-        "    .load()\n",
-        "\n",
-        "df.show()"
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "# Write data to PostgreSQL\n",
-        "# Create a sample DataFrame\n",
-        "data = [(1, \"John Doe\", \"john@example.com\"), \n",
-        "        (2, \"Jane Smith\", \"jane@example.com\"), \n",
-        "        (3, \"Mike Johnson\", \"mike@example.com\")]\n",
-        "columns = [\"id\", \"name\", \"email\"]\n",
-        "new_df = spark.createDataFrame(data, columns)\n",
-        "\n",
-        "# Write to PostgreSQL\n",
-        "new_df.write \\\n",
-        "    .format(\"jdbc\") \\\n",
-        "    .option(\"url\", \"jdbc:postgresql://postgres:5432/datamart\") \\\n",
-        "    .option(\"dbtable\", \"processed.users\") \\\n",
-        "    .option(\"user\", \"spark\") \\\n",
-        "    .option(\"password\", \"spark\") \\\n",
-        "    .option(\"driver\", \"org.postgresql.Driver\") \\\n",
-        "    .mode(\"overwrite\") \\\n",
-        "    .save()"
-       ]
-      },
-      {
-       "cell_type": "code",
-       "execution_count": null,
-       "metadata": {},
-       "source": [
-        "# Stop the Spark session\n",
-        "spark.stop()"
-       ]
-      }
-     ],
-     "metadata": {
-      "kernelspec": {
-       "display_name": "Python 3",
-       "language": "python",
-       "name": "python3"
-      },
-      "language_info": {
-       "codemirror_mode": {
-        "name": "ipython",
-        "version": 3
-       },
-       "file_extension": ".py",
-       "mimetype": "text/x-python",
-       "name": "python",
-       "nbconvert_exporter": "python",
-       "pygments_lexer": "ipython3",
-       "version": "3.8.10"
-      }
-     },
-     "nbformat": 4,
-     "nbformat_minor": 4
-    }
+  init.sh: |
+    #!/bin/bash
+    
+    # Wait for notebook to be ready
+    sleep 5
+    
+    # Create directories
+    mkdir -p /home/jovyan/work/streaming
+    mkdir -p /home/jovyan/work/batch
+    mkdir -p /home/jovyan/work/etl
+    mkdir -p /home/jovyan/work/elt
+    mkdir -p /home/jovyan/work/generators
+    
+    # Copy custom files
+    cp -r /python/* /home/jovyan/work/
+    
+    echo "Jupyter environment initialized with data_park Python files"
+    
+  jupyter_spark_config.py: |
+    # Configuration script for PySpark in Jupyter
+    
+    import os
+    from pyspark.sql import SparkSession
+    
+    def create_spark_session(app_name="Data Park Notebook", use_local=True, packages=None):
+        """Create a Spark session configured for the Data Park environment.
+        
+        Args:
+            app_name: Name of the Spark application
+            use_local: Whether to use local mode (True) or cluster mode (False)
+            packages: Additional packages to include
+            
+        Returns:
+            SparkSession: Configured Spark session
+        """
+        # Base builder
+        builder = SparkSession.builder.appName(app_name)
+        
+        # Mode configuration
+        if use_local:
+            builder = builder.master("local[*]")
+        else:
+            builder = builder.master("spark://spark-master:7077")
+        
+        # Memory configuration
+        builder = builder.config("spark.driver.memory", "1g") \
+                        .config("spark.executor.memory", "1g") \
+                        .config("spark.sql.shuffle.partitions", "8")
+        
+        # Package configuration
+        if packages:
+            builder = builder.config("spark.jars.packages", packages)
+            
+        # JDBC driver for PostgreSQL
+        builder = builder.config("spark.jars", "/tmp/postgresql-42.5.0.jar")
+        
+        # Create and return session
+        return builder.getOrCreate()
+    
+    # Download PostgreSQL JDBC driver if needed
+    def ensure_postgres_driver():
+        """Ensure PostgreSQL JDBC driver is available"""
+        import os
+        import urllib.request
+        
+        driver_path = "/tmp/postgresql-42.5.0.jar"
+        
+        if not os.path.exists(driver_path):
+            print("Downloading PostgreSQL JDBC driver...")
+            url = "https://jdbc.postgresql.org/download/postgresql-42.5.0.jar"
+            urllib.request.urlretrieve(url, driver_path)
+            print(f"Driver downloaded to {driver_path}")
+        else:
+            print("PostgreSQL JDBC driver already available")
+            
+        return driver_path
+    
+    # Pre-download the driver
+    ensure_postgres_driver()
+    
+    # Create convenience function for streaming
+    def create_streaming_session(app_name="Streaming App"):
+        """Create a Spark session configured for streaming with Kafka"""
+        return create_spark_session(
+            app_name=app_name, 
+            use_local=True,
+            packages="org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1"
+        )
+    
+    print("Spark helper functions loaded. Use create_spark_session() or create_streaming_session()")
